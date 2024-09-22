@@ -7,11 +7,15 @@ from utils import timestamp
 class PeoplePerHourSpider(scrapy.Spider):
     name = "people_per_hour"
     allowed_domains = ["www.peopleperhour.com"]
-    start_urls = ["https://www.peopleperhour.com/freelance-jobs"]
+    # start_urls = ["https://www.peopleperhour.com/freelance-jobs"]
+    def start_requests(self):
+        for page in range(1, 78):
+            yield scrapy.Request(f"https://www.peopleperhour.com/freelance-jobs?page={page}", self.parse)
 
     def parse(self, response):
-        page = response.url.split("/")[-2]
-        filename = f"../output/{page}-{timestamp()}.json"
+        self.log(f"@@@ Url {response.url}")
+        page = response.url.split("=")[-1]
+        filename = f"../output/page-{page}-{timestamp()}.json"
         data = []
         containers = response.xpath(
             '//li[contains(@class, "list__item⤍List")]')
